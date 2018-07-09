@@ -1,0 +1,18 @@
+{
+    "name": "MySQL Explain",
+    "identifier": "com.explainmysql",
+    "version": "1.0",
+    "detail": "This plugin helps with analyzing MySQL and MariaDB queries.",
+    "author": "Tobias Petry",
+    "authorEmail": "hello@tpetry.me",
+    "site": "https://explainmysql.com",
+    "scripts": [
+        {
+            "location": "main",
+            "type": "action",
+            "shortcut": "control+e",
+            "script": "build/plugin.js",
+            "name": "Explain SQL"
+        }
+    ]
+}

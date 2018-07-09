@@ -1,0 +1,33 @@
+{
+  "private": true,
+  "name": "com.explainmysql.tableplusplugin",
+  "version": "1.0",
+  "description": "This plugin helps you analyzing EXPLAIN plans.",
+  "main": "plugin/index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "https://explainmysql.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.22.8",
+    "@babel/preset-env": "^7.22.7",
+    "babel-loader": "^9.1.2",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.1",
+    "postcss": "^8.4.25",
+    "postcss-loader": "^7.3.3",
+    "postcss-preset-env": "^9.0.0",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@ryangjchandler/alpine-clipboard": "^2.2.0",
+    "@ryangjchandler/alpine-tooltip": "^1.2.0",
+    "alpinejs": "^3.12.3",
+    "tailwindcss": "^3.3.2",
+    "tippy.js": "^6.3.7"
+  }
+}
