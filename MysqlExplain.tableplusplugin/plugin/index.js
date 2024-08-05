@@ -2,8 +2,8 @@
 
 import { executeQuery } from './helpers';
 
-function handleResults(context, sql, resExplainJson, resExplainTraditional, resExplainTree, resVersion, resWarnings) {
-    for (const res of [resExplainJson, resExplainTraditional, resVersion, resWarnings]) {
+function handleResults(context, sql, resExplainJson, resExplainTree, resVersion) {
+    for (const res of [resExplainJson, resVersion]) {
         if (res instanceof Error) {
             context.alert('Error', res.message);
 
@@ -14,20 +14,18 @@ function handleResults(context, sql, resExplainJson, resExplainTraditional, resE
     const data = {
         query: sql,
         version: resVersion[0]?.version,
-        explain_traditional: resExplainTraditional,
         explain_json: resExplainJson[0]?.EXPLAIN,
         explain_tree: resExplainTree[0]?.EXPLAIN ?? null,
-        warnings: resWarnings,
     };
 
     context
-        .loadFile(`${Application.pluginRootPath()}/com.explainmysql.tableplusplugin/build/ui.html`, null)
-        .evaluate(`submitPlan(${JSON.stringify(data, (_, value) => typeof value === 'undefined' ? null : value)})`);
+        .loadFile(`${Application.pluginRootPath()}/com.mysqlexplain.tableplusplugin/build/ui.html`, null)
+        .evaluate(`displayPlan(${JSON.stringify(data, (_, value) => typeof value === 'undefined' ? null : value)})`);
 }
 
 global.onRun = function(context) {
-    if (!['MariaDB', 'MySQL'].includes(context.driver())) {
-        context.alert('Error', 'Only MySQL and MariaDB databases are supported.');
+    if (!['MySQL'].includes(context.driver())) {
+        context.alert('Error', 'Only MySQL databases are supported.');
 
         return;
     }
@@ -46,17 +44,13 @@ global.onRun = function(context) {
     // current one is finished (indicating sync logic). Therefore, the code needs to be developed in async way but not
     // be complicated by pipelining the SQL queries.
     let resExplainJson = null;
-    let resExplainTraditional = null;
     let resExplainTree = null;
     let resVersion = null;
-    let resWarnings = null;
     executeQuery(context, 'SELECT VERSION() as version ', (res) => resVersion = res);
-    executeQuery(context, context.driver() === 'MariaDB' ? `EXPLAIN EXTENDED ${sql}` : `EXPLAIN FORMAT=TRADITIONAL ${sql}`, (res) => resExplainTraditional = res);
-    executeQuery(context, 'SHOW WARNINGS', (res) => resWarnings = res);
     executeQuery(context, `EXPLAIN FORMAT=JSON ${sql}`, (res) => resExplainJson = res);
     executeQuery(context, `EXPLAIN FORMAT=TREE ${sql}`, (res) => {
         resExplainTree = res;
 
-        handleResults(context, sql, resExplainJson, resExplainTraditional, resExplainTree, resVersion, resWarnings);
+        handleResults(context, sql, resExplainJson, resExplainTree, resVersion);
     });
 };

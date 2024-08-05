@@ -1,53 +1,57 @@
 import './index.css';
 
-import Alpine from 'alpinejs';
-import Clipboard from '@ryangjchandler/alpine-clipboard';
-import Tooltip from '@ryangjchandler/alpine-tooltip';
+async function sendPlan(data) {
+    const response = await fetch('https://api.mysqlexplain.com/v2/explains', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'User-Agent': 'tpetry/tableplus-mysql-explain@2.0',
+        },
+        body: JSON.stringify(data),
+    });
 
-let initialized = false;
-document.addEventListener('alpine:init', () => {
-    initialized = true;
-    Alpine.store('state', 'loading');
-});
-
-window.submitPlan = async function (data) {
-    if (!initialized) {
-        document.addEventListener('alpine:init', () => {
-            initialized = true;
-            submitPlan(data);
-        });
-
-        return;
+    if (response.ok) {
+        return (await response.json()).url;
+    }
+    if(response.status === 400) {
+        throw new Error((await response.json()).message);
+    }
+    if(response.status === 422) {
+        throw new Error(`Validation Failed: ${JSON.stringify(await response.json())}`);
+    }
+    if(response.status === 429) {
+        throw new Error("Rate Limit Reached: Too many requests. Please try again later.");
     }
 
-    try {
-        const response = await fetch('https://explainmysql.com/api/v1/plans', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'User-Agent': 'tpetry/tableplus-mysql-explain@1.0',
-            },
-            body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-            Alpine.store('state', 'success');
-            Alpine.store('url', (await response.json()).url);
-        } else {
-            const status = { 422: 'Validation Failed', 429: 'Too Many Requests', 503: 'Service Unavailable'}[response.status] || 'Unknown';
-            Alpine.store('state', 'error');
-            Alpine.store('errorTitle', `HTTP ${response.status} (${status})`);
-            Alpine.store('errorMessage', await response.text());
-        }
-    } catch (e) {
-        Alpine.store('state', 'error');
-        Alpine.store('errorTitle', 'Unknown Error');
-        Alpine.store('errorMessage', e.message);
-    }
+    throw new Error(`Unknown Error(${response.status}): ${(await response.text()).substring(0, 250)}`);
 }
 
-window.Alpine = Alpine;
-Alpine.plugin(Clipboard);
-Alpine.plugin(Tooltip);
-Alpine.start();
+async function getOembed(url) {
+    const response = await fetch('https://api.mysqlexplain.com/v2/oembed.json?showFullscreenButton=false&url=' + encodeURIComponent(url));
+
+    if (response.ok) {
+        return (await response.json()).html;
+    }
+
+    throw new Error(`Unknown Error(${response.status}): ${(await response.text()).substring(0, 250)}`);
+}
+
+window.displayPlan = function (data) {
+    const loading = setTimeout(() => document.getElementById('loading').style.display = 'block', 2500);
+
+    sendPlan(data)
+      .then(getOembed)
+      .then((html) => {
+          clearTimeout(loading);
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('explain').style.display = 'block';
+          document.getElementById('explain').innerHTML = html;
+      })
+      .catch((e) => {
+          clearTimeout(loading);
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').style.display = 'block';
+          document.getElementById('error-message').innerText = e.message;
+      });
+}

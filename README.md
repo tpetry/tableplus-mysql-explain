@@ -1,6 +1,6 @@
 # What is this
 
-This is a TablePlus Plugin to send MySQL and MariaDB EXPLAIN information to [explainmysql.com](https://explainmysql.com/)
+This is a TablePlus Plugin to visualize MySQL EXPLAIN plans with [mysqlexplain.com](https://mysqlexplain.com/).
 
 ![](https://github.com/tpetry/tableplus-mysql-explain/blob/main/.github/demo.gif)
 
@@ -24,4 +24,4 @@ open .
 
 1. Open a SQL Query editor.
 2. Select a statement.
-3. Menu: Plugins -> Explain SQL.
+3. Menu: Plugins -> Visual Explain SQL.
