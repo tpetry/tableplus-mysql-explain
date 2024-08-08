@@ -25,7 +25,7 @@ function handleResults(context, sql, resExplainJson, resExplainTree, resVersion)
 
 global.onRun = function(context) {
     if (!['MySQL'].includes(context.driver())) {
-        context.alert('Error', 'Only MySQL databases are supported.');
+        context.alert('Error', `Only MySQL databases are supported (${context.driver()} used).`);
 
         return;
     }

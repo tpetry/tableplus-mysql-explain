@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "com.explainmysql.tableplusplugin",
-  "version": "1.0",
+  "version": "2.1",
   "description": "This plugin helps you analyzing EXPLAIN plans.",
   "main": "plugin/index.js",
   "scripts": {

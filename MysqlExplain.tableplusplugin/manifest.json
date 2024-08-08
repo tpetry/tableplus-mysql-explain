@@ -1,7 +1,7 @@
 {
     "name": "MySQL Visual Explain",
     "identifier": "com.mysqlexplain",
-    "version": "2.0",
+    "version": "2.1",
     "detail": "This plugin helps with analyzing MySQL queries.",
     "author": "Tobias Petry",
     "authorEmail": "hello@tpetry.me",
